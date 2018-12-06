@@ -1,2 +1,3 @@
-# 04_BattleTank
-Section 4 of Ben Tristem's Unreal 4 Course
+# Unreal Engine Developer Course - Section 4 - Battle Tank
+
+Bonjour!
