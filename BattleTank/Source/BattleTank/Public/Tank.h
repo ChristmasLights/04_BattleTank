@@ -32,5 +32,5 @@ public:
 	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
 
 	UPROPERTY(EditAnywhere, Category = Firing)
-	float LaunchSpeed = 100000.f; // Sensible starting value of 1000 m/s
+	float LaunchSpeed = 100000.f; // TODO find sensible default
 };
