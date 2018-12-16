@@ -21,7 +21,7 @@ protected:
 public:
 	UTankAimingComponent();
 
-	void AimAt(FVector HitLocation);
+	void AimAt(FVector HitLocation, float LaunchSpeed);
 	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
 
 private:
