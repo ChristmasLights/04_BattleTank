@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Tank.h"
-
+#include "Engine/World.h"
 #include "TankPlayerController.generated.h"
 
 UCLASS()
@@ -17,4 +17,9 @@ private:
 	ATank* GetControlledTank() const;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+	// Start the tank moving the barrel so that a shot would hit where
+	// the crosshair intersects the world.
+	void AimTowardsCrosshair();
 };
