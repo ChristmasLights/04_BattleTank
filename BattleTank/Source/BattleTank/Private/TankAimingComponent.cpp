@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "../Public/TankAimingComponent.h"
+#include "../Public/TankBarrel.h"
 
 UTankAimingComponent::UTankAimingComponent()
 {
@@ -14,6 +15,16 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIM
 	FVector OutLaunchVelocity;
 	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
 
+	DrawDebugLine(
+		GetWorld(),
+		StartLocation,
+		HitLocation,
+		FColor(255, 0, 0),
+		false,
+		0.f,
+		0.f,
+		1.f);
+
 	// Calculate OutLaunchVelocity
 	bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity(
 		this,
@@ -24,7 +35,7 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIM
 		false,
 		0.f,
 		0.f,
-		ESuggestProjVelocityTraceOption::OnlyTraceWhileAscending,
+		ESuggestProjVelocityTraceOption::DoNotTrace,
 		FCollisionResponseParams::DefaultResponseParam,
 		TArray<AActor *>(),
 		false);

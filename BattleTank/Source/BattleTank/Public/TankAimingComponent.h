@@ -7,7 +7,9 @@
 #include "Engine/World.h"
 #include "Engine/Classes/Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "TankBarrel.h"
+
+#include "DrawDebugHelpers.h"
+
 #include "TankAimingComponent.generated.h"
 
 // Forward declaration
