@@ -23,7 +23,8 @@ public:
 	UTankAimingComponent();
 
 	void AimAt(FVector HitLocation, float LaunchSpeed);
-	void SetBarrelReference(UTankBarrel* BarrelToSet);
+	void SetBarrelReference(UTankBarrel* BarrelToSet); // Uses forward declaration to hook into UTankBarrel class
+
 	// TODO add SetTurretReference
 
 private:

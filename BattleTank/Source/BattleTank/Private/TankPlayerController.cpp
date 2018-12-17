@@ -17,7 +17,7 @@ void ATankPlayerController::BeginPlay()
 void ATankPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AimTowardsCrosshair();
+	AimTowardsCrosshair(); // AIMING CHAIN 01
 }
 
 void ATankPlayerController::AimTowardsCrosshair()
@@ -27,7 +27,7 @@ void ATankPlayerController::AimTowardsCrosshair()
 	FVector HitLocation; // Out parameter
 	if (GetSightRayHitLocation(HitLocation)) // Has "side-effect", is going to line trace
 	{
-		GetControlledTank()->AimAt(HitLocation);
+		GetControlledTank()->AimAt(HitLocation); // AIMING CHAIN 02. Now that we have a desired hit location, send it to the tank for calculations.
 	}
 }
 
