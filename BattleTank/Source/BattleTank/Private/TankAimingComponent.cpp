@@ -2,28 +2,22 @@
 
 #include "../Public/TankAimingComponent.h"
 #include "../Public/TankBarrel.h"
+#include "../Public/TankTurret.h"
 
 UTankAimingComponent::UTankAimingComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true; // TODO does this need to tick?
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIMING CHAIN 04 (called from Tank). Performs ballistic calculation given desired location and tank launch speed.
 {
 	if (!Barrel) { return; }
+	if (!Turret) { return; }
 
 	FVector OutLaunchVelocity;
 	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
 
-	DrawDebugLine(
-		GetWorld(),
-		StartLocation,
-		HitLocation,
-		FColor(255, 0, 0),
-		false,
-		0.f,
-		0.f,
-		1.f);
+
 
 	// Calculate OutLaunchVelocity
 	bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity(
@@ -38,7 +32,7 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIM
 		ESuggestProjVelocityTraceOption::DoNotTrace,
 		FCollisionResponseParams::DefaultResponseParam,
 		TArray<AActor *>(),
-		true);
+		false);
 
 	auto Time = GetWorld()->GetTimeSeconds();
 
@@ -47,17 +41,17 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIM
 		auto AimDirection = OutLaunchVelocity.GetSafeNormal(); // Turn OutLaunchVelocity into unit vector
 		auto TankName = GetOwner()->GetName();
 		MoveBarrelTowards(AimDirection);
-		UE_LOG(LogTemp, Warning, TEXT("%f: Aiming!"), Time);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%f: No solution found!"), Time);
 	}
 }
 
 void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet) // Passed from the Tank, set up via the blueprint on BeginPlay
 {
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet) // Passed from the Tank, set up via the blueprint on BeginPlay
+{
+	Turret = TurretToSet;
 }
 
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
@@ -67,5 +61,34 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
 
+	
+	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
+	FVector AimedLocation = StartLocation + BarrelRotator.Vector() * 10000;
+	if (!DeltaRotator.Equals(FRotator(0), 0.5))
+	{
+		DrawDebugLine(
+			GetWorld(),
+			StartLocation,
+			AimedLocation,
+			FColor(255, 0, 0),
+			false,
+			0.f,
+			0.f,
+			2.f);
+	}
+	else
+	{
+		DrawDebugLine(
+			GetWorld(),
+			StartLocation,
+			AimedLocation,
+			FColor(0, 255, 0),
+			false,
+			0.f,
+			0.f,
+			4.f);
+	}
+	
 	Barrel->Elevate(DeltaRotator.Pitch); // AIMING CHAIN 05, calls to TankBarrel
+	Turret->Rotate(DeltaRotator.Yaw); // AIMING CHAIN 05, calls to TankTurret
 }

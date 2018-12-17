@@ -9,7 +9,9 @@
 
  // Forward declarations
 class UTankBarrel;
+class UTankTurret;
 class UTankAimingComponent;
+class AProjectile;
 
 UCLASS()
 class BATTLETANK_API ATank : public APawn
@@ -21,18 +23,29 @@ protected:
 
 	UTankAimingComponent* TankAimingComponent = nullptr;
 
-private:
-	ATank();
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 public:
-	void AimAt(FVector HitLocation);
-
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	void SetBarrelReference(UTankBarrel* BarrelToSet); // Here is where we get the barrel for the tank, via the blueprint hook, called on BeginPlay
 
+	UFUNCTION(BlueprintCallable, Category = Setup)
+	void SetTurretReference(UTankTurret* TurretToSet); // Here is where we get the turret for the tank, via the blueprint hook, called on BeginPlay
+
 	UPROPERTY(EditAnywhere, Category = Firing)
-	float LaunchSpeed = 100000.f; // TODO find sensible default
+	float LaunchSpeed = 100000.f;
+
+	UFUNCTION(BlueprintCallable, Category = Firing)
+	void Fire();
+
+	UPROPERTY(EditAnywhere, Category = Setup)
+	TSubclassOf<AProjectile> ProjectileBluePrint;
+
+	void AimAt(FVector HitLocation);
+
+private:
+	ATank();
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override; // Called to bind functionality to input
+
+	UTankBarrel* Barrel = nullptr;
+
 };
