@@ -44,9 +44,7 @@ void ATank::Fire()
 {
 	bool bIsReloaded = GetWorld()->GetTimeSeconds() - LastFireTime > ReloadTimeInSeconds;
 
-	if (!Barrel) { return; }
-
-	if (bIsReloaded)
+	if (Barrel && bIsReloaded)
 	{
 		auto Projectile = GetWorld()->SpawnActor<AProjectile>(
 			ProjectileBluePrint,

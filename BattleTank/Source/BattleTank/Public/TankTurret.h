@@ -21,8 +21,4 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float MaxDegreesPerSecond = 25.f;
 
-	float MaxYawDegrees = 180.f;
-
-	float MinYawDegrees = -180.f;
-
 };
