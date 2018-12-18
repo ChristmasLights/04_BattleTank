@@ -18,7 +18,7 @@ public:
 
 private:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float MaxDegreesPerSecond = 25.f;
 
 	float MaxYawDegrees = 180.f;
