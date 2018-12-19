@@ -1,11 +1,14 @@
 
 BattleTank/Content/StarterContent/
+BattleTank/Content/Models/
 
 */Build
 */Binaries
 */DerivedDataCache
 */Intermediate
 */Saved
+
+
 
 # Visual Studio 2015 user specific files
 .vs/
