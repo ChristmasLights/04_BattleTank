@@ -15,9 +15,7 @@ void UTankHoverThruster::BeginPlay()
 	TankRoot = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
 	TankLeg = Cast<UPrimitiveComponent>(GetAttachParent());
 
-	/// UE_LOG(LogTemp, Warning, TEXT("Root is %s, leg is %s!"), *TankRoot->GetName(), *TankLeg->GetName())
-
-	Mass = TankRoot->GetMass() / 4;
+	Mass = TankRoot->GetMass() / NumberOfThrusters;
 
 	Weight = -1 * Mass * GetWorld()->GetGravityZ();
 }
@@ -32,8 +30,6 @@ void UTankHoverThruster::Hover()
 {
 	FVector ThrustPoint = GetAttachParent()->GetSocketLocation(FName("HoverThruster")); // Gets thruster location in world
 
-	/// UE_LOG(LogTemp, Warning, TEXT("Thrust of %f at %s!"), Weight, *ThrustPoint.ToString())
-
 	// Current Height is difference between trace hit point and socket z point
 	// Height Deviation is difference between Current Height and Desired Float Height
 	// Raw Accel is Height Deviation times(Gain squared)
@@ -43,16 +39,10 @@ void UTankHoverThruster::Hover()
 	// Force is (Accel times Mass) + Weight
 
 
-	// TODO Consider false line trace
 	float Height = GetHeight(ThrustPoint);
 	float ZSpeed = TankLeg->GetPhysicsLinearVelocityAtPoint(ThrustPoint).Z;
-
-	float Accel = ((DesiredHeight - Height) * Gain * Gain) - (ZSpeed * Damping * Gain * 2);
-
+	float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (ZSpeed * Damping * Gain * 2);
 	float Force = (Mass * Accel) + Weight;
-
-	// UE_LOG(LogTemp, Warning, TEXT("Force is %f!"), Force)
-
 	// Add Force at socket
 	TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
 }
@@ -61,7 +51,7 @@ void UTankHoverThruster::Hover()
 float UTankHoverThruster::GetHeight(FVector ThrustPoint)
 {
 	FHitResult Ground;
-	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, 1000), ECollisionChannel::ECC_Visibility);
+	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 2), ECollisionChannel::ECC_Visibility);
 
 	if (Ground.IsValidBlockingHit())
 	{

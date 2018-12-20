@@ -32,12 +32,17 @@ void ATank::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
 	TankAimingComponent->SetBarrelReference(BarrelToSet); // Once called via the blueprint on BeginPlay, passes the barrel through to the aiming component
 
-	Barrel = BarrelToSet; // Added this in so that the tank itself can access its barrel component
+	Barrel = BarrelToSet; // Need this for spawning the projectile
 }
 
 void ATank::SetTurretReference(UTankTurret* TurretToSet)
 {
 	TankAimingComponent->SetTurretReference(TurretToSet); // Once called via the blueprint on BeginPlay, passes the turret through to the aiming component
+}
+
+void ATank::SetGearHeadReference(UTankGearHead* GearHeadToSet)
+{
+	TankAimingComponent->SetGearHeadReference(GearHeadToSet); // Once called via the blueprint on BeginPlay, passes the gearhead through to the aiming component
 }
 
 void ATank::Fire()

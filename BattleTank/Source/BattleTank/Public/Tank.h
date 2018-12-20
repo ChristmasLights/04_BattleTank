@@ -10,6 +10,7 @@
  // Forward declarations
 class UTankBarrel;
 class UTankTurret;
+class UTankGearHead;
 class UTankAimingComponent;
 class AProjectile;
 
@@ -23,13 +24,18 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Setup)
-	void SetBarrelReference(UTankBarrel* BarrelToSet); // Here is where we get the barrel for the tank, via the blueprint hook, called on BeginPlay
+	void SetBarrelReference(UTankBarrel* BarrelToSet); // Get the barrel via the blueprint hook, called on BeginPlay
 
 	UFUNCTION(BlueprintCallable, Category = Setup)
-	void SetTurretReference(UTankTurret* TurretToSet); // Here is where we get the turret for the tank, via the blueprint hook, called on BeginPlay
+	void SetTurretReference(UTankTurret* TurretToSet); // Get the turret via the blueprint hook, called on BeginPlay
+
+	UFUNCTION(BlueprintCallable, Category = Setup)
+	void SetGearHeadReference(UTankGearHead* GearHeadToSet); // Get the gearhead via the blueprint hook, called on BeginPlay
+
 
 	UFUNCTION(BlueprintCallable, Category = Firing)
 	void Fire();
+
 
 	UPROPERTY(EditDefaultsOnly, Category = Setup)
 	TSubclassOf<AProjectile> ProjectileBluePrint;
@@ -49,6 +55,7 @@ private:
 
 	UTankAimingComponent* TankAimingComponent = nullptr;
 	UTankBarrel* Barrel = nullptr;
+	UTankGearHead* GearHead = nullptr;
 
 	float LastFireTime = 0;
 };

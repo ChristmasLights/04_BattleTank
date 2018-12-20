@@ -27,22 +27,25 @@ public:
 	void Hover();
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
-		float DesiredHeight = 100.f;
+	float DesiredHeight = 120.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
-		float Gain = 6.f;
+	float Gain = 2.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
-		float Damping = 1.f;
+	float Damping = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = Hover)
+	int32 NumberOfThrusters = 4;
 
 private:
 	float Mass;
 
-	float Weight;
+	float Weight; // This is the weight to be supported by each individual thruster; i.e. inversely proportional to NumberOfThrusters
 
 	UPrimitiveComponent* TankRoot;
 	UPrimitiveComponent* TankLeg;
 
 	float GetHeight(FVector ThrustPoint);
-	float LastHeight = 0;
+	float LastHeight;
 };
