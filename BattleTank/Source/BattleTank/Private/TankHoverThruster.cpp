@@ -18,6 +18,8 @@ void UTankHoverThruster::BeginPlay()
 	Mass = TankRoot->GetMass() / NumberOfThrusters;
 
 	Weight = -1 * Mass * GetWorld()->GetGravityZ();
+
+	LastHeight = DesiredHeight;
 }
 
 void UTankHoverThruster::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,7 +45,7 @@ void UTankHoverThruster::Hover()
 	float ZSpeed = TankLeg->GetPhysicsLinearVelocityAtPoint(ThrustPoint).Z;
 	float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (ZSpeed * Damping * Gain * 2);
 	float Force = (Mass * Accel) + Weight;
-	// Add Force at socket
+
 	TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
 }
 
