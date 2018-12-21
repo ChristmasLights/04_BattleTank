@@ -24,6 +24,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	void Initialize(UTankRearLeg* LeftRearLegToSet, UTankRearLeg* RightRearLegToSet);
+
+	virtual void RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed) override;
 	
 private:
 

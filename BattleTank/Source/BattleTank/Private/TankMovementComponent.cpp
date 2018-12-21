@@ -9,6 +9,15 @@ void UTankMovementComponent::Initialize(UTankRearLeg * LeftRearLegToSet, UTankRe
 	RightRearLeg = RightRearLegToSet;
 }
 
+void UTankMovementComponent::RequestDirectMove(const FVector & MoveVelocity, bool bForceMaxSpeed)
+{
+	// No need to call Super::, as we are replacing the functionality here
+
+	auto TankName = GetOwner()->GetName();
+	auto MoveVelocityString = MoveVelocity.ToString();
+	UE_LOG(LogTemp, Warning, TEXT("Tank %s vectoring to %s"), *TankName, *MoveVelocityString)
+}
+
 void UTankMovementComponent::IntendMoveForward(float Throw)
 {
 	if (!LeftRearLeg || !RightRearLeg) { UE_LOG(LogTemp, Error, TEXT("No Leg!")); return; }
