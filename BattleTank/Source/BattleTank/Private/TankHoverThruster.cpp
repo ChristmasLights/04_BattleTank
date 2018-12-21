@@ -13,7 +13,10 @@ void UTankHoverThruster::BeginPlay()
 	Super::BeginPlay();
 
 	TankRoot = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
+	if (TankRoot == nullptr) { UE_LOG(LogTemp, Warning, TEXT("Couldn't find Leg attach parent!")); return; }
+
 	TankLeg = Cast<UPrimitiveComponent>(GetAttachParent());
+	if (TankRoot == nullptr) { UE_LOG(LogTemp, Warning, TEXT("Couldn't find HoverThruster attach parent!")); return; }
 
 	Mass = TankRoot->GetMass() / NumberOfThrusters;
 
@@ -25,6 +28,7 @@ void UTankHoverThruster::BeginPlay()
 void UTankHoverThruster::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	Hover();
 }
 
@@ -42,18 +46,44 @@ void UTankHoverThruster::Hover()
 
 
 	float Height = GetHeight(ThrustPoint);
-	float ZSpeed = TankLeg->GetPhysicsLinearVelocityAtPoint(ThrustPoint).Z;
-	float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (ZSpeed * Damping * Gain * 2);
-	float Force = (Mass * Accel) + Weight;
 
-	TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+	FVector AngVel = TankLeg->GetPhysicsAngularVelocityInDegrees();
+	FVector LinVel = TankLeg->GetPhysicsLinearVelocityAtPoint(ThrustPoint);
+	FVector TankAngVel = TankRoot->GetPhysicsAngularVelocityInDegrees();
+
+	float Time = GetWorld()->GetTimeSeconds();
+
+	if (Time - CutoffTime > RestartTime) // If the thruster has cooled off
+	{
+		if (Height < 1000 && AngVel.Size() < CutoffAngularVelocity) // If the vehicle isn't too high or spinning too fast
+		{
+			float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
+
+			if (Time - CutoffTime - RestartTime > 1) // If 1-second ramp-up has completed
+			{
+				// Calculate and apply proper hover force
+				float Force = (Mass * Accel) + Weight;
+				TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			}
+			else
+			{
+				// Ramp up force over 1 second
+				float Force = (Mass * Accel) * (Time - CutoffTime - RestartTime) * (Time - CutoffTime - RestartTime) + Weight;
+				TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			}
+		}
+		else
+		{
+			CutoffTime = Time;
+		}
+	}
 }
 
 //Line trace by visibility from hover thruster socket point down
 float UTankHoverThruster::GetHeight(FVector ThrustPoint)
 {
 	FHitResult Ground;
-	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 2), ECollisionChannel::ECC_Visibility);
+	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 100000), ECollisionChannel::ECC_Visibility);
 
 	if (Ground.IsValidBlockingHit())
 	{

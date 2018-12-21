@@ -27,10 +27,10 @@ public:
 	void Hover();
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
-	float DesiredHeight = 120.f;
+	float DesiredHeight = 200.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
-	float Gain = 2.5f;
+	float Gain = 2.4f;
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
 	float Damping = 1.f;
@@ -38,14 +38,27 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
 	int32 NumberOfThrusters = 4;
 
+	UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	float CutoffAngularVelocity = 400.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	float CutoffRollVelocity = 400.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	float RestartTime = 2.f;
+
+	//UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	//float StartupTime = 1.f;
+
 private:
 	float Mass;
 
 	float Weight; // This is the weight to be supported by each individual thruster; i.e. inversely proportional to NumberOfThrusters
 
-	UPrimitiveComponent* TankRoot;
-	UPrimitiveComponent* TankLeg;
+	UPrimitiveComponent* TankRoot = nullptr;
+	UPrimitiveComponent* TankLeg = nullptr;
 
 	float GetHeight(FVector ThrustPoint);
 	float LastHeight;
+	float CutoffTime = 0;
 };
