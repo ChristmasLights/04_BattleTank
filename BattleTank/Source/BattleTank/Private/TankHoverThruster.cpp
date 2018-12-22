@@ -13,10 +13,10 @@ void UTankHoverThruster::BeginPlay()
 	Super::BeginPlay();
 
 	TankRoot = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
-	if (TankRoot == nullptr) { UE_LOG(LogTemp, Warning, TEXT("Couldn't find Leg attach parent!")); return; }
+	if (!ensure(TankRoot)) { return; }
 
 	TankLeg = Cast<UPrimitiveComponent>(GetAttachParent());
-	if (TankRoot == nullptr) { UE_LOG(LogTemp, Warning, TEXT("Couldn't find HoverThruster attach parent!")); return; }
+	if (!ensure(TankLeg)) { return; }
 
 	Mass = TankRoot->GetMass() / NumberOfThrusters;
 

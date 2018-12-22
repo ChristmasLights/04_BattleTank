@@ -25,14 +25,14 @@ void UTankMovementComponent::RequestDirectMove(const FVector & MoveVelocity, boo
 
 void UTankMovementComponent::IntendMoveForward(float Throw)
 {
-	if (!LeftRearLeg || !RightRearLeg) { UE_LOG(LogTemp, Error, TEXT("No Leg!")); return; }
+	if (!ensure(LeftRearLeg && RightRearLeg)) { return; }
 	LeftRearLeg->SetThrottle(Throw);
 	RightRearLeg->SetThrottle(Throw);
 }
 
 void UTankMovementComponent::IntendTurnRight(float Throw)
 {
-	if (!LeftRearLeg || !RightRearLeg) { UE_LOG(LogTemp, Error, TEXT("No Leg!")); return; }
+	if (!ensure(LeftRearLeg && RightRearLeg)) { return; }
 	LeftRearLeg->SetThrottle(Throw);
 	RightRearLeg->SetThrottle(-Throw);
 }

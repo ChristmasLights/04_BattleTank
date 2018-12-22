@@ -8,16 +8,10 @@ void ATankAIController::BeginPlay()
 	Super::BeginPlay();
 
 	ControlledTank = Cast<ATank>(GetPawn());
-	if (!ControlledTank)
-	{
-		UE_LOG(LogTemp, Error, TEXT("AIController not posessing a tank!"));
-	}
+	if (!ensure(ControlledTank)) { return; }
 
 	PlayerTank = Cast<ATank>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (!PlayerTank)
-	{
-		UE_LOG(LogTemp, Error, TEXT("AIController can't find player tank!"));
-	}
+	if (!ensure(PlayerTank)) { return; }
 }
 
 void ATankAIController::Tick(float DeltaTime)
