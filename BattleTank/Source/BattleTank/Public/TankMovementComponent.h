@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright ChristmasLights 2018
 
 #pragma once
 
@@ -16,20 +16,21 @@ class BATTLETANK_API UTankMovementComponent : public UNavMovementComponent
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = Input)
-	void IntendMoveForward(float Throw);
-
-	UFUNCTION(BlueprintCallable, Category = Input)
-	void IntendTurnRight(float Throw);
-
-	UFUNCTION(BlueprintCallable, Category = Setup)
+	UFUNCTION(BlueprintCallable, Category = "Setup")
 	void Initialize(UTankRearLeg* LeftRearLegToSet, UTankRearLeg* RightRearLegToSet);
 
-	virtual void RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed) override;
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void IntendMoveForward(float Throw);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void IntendTurnRight(float Throw);
 	
 private:
 
 	UTankRearLeg* LeftRearLeg = nullptr;
 	UTankRearLeg* RightRearLeg = nullptr;
+
+	// Called from the pathfinding logic by an AI controller
+	virtual void RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed) override;
 
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright ChristmasLights 2018
 
 #include "../Public/Tank.h"
 #include "../Public/TankAimingComponent.h"

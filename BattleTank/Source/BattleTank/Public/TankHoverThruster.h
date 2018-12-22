@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright ChristmasLights 2018
 
 #pragma once
 
@@ -26,25 +26,25 @@ public:
 
 	void Hover();
 
-	UPROPERTY(EditDefaultsOnly, Category = Hover)
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	float DesiredHeight = 80.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = Hover)
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	float Gain = 2.4f;
 
-	UPROPERTY(EditDefaultsOnly, Category = Hover)
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	float Damping = 1.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = Hover)
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	int32 NumberOfThrusters = 4;
 
-	UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	UPROPERTY(EditDefaultsOnly, Category = "Cutoff")
 	float CutoffAngularVelocity = 400.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	UPROPERTY(EditDefaultsOnly, Category = "Cutoff")
 	float CutoffRollVelocity = 400.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = Cutoff)
+	UPROPERTY(EditDefaultsOnly, Category = "Cutoff")
 	float RestartTime = 2.f;
 
 	//UPROPERTY(EditDefaultsOnly, Category = Cutoff)

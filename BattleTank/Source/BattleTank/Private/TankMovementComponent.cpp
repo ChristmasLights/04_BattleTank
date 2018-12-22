@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright ChristmasLights 2018
 
 #include "../Public/TankMovementComponent.h"
 #include "../Public/TankRearLeg.h"
@@ -21,16 +21,6 @@ void UTankMovementComponent::RequestDirectMove(const FVector & MoveVelocity, boo
 	float RightThrow = FVector::CrossProduct(TankForward, AIForwardIntention).Z;
 	IntendMoveForward(ForwardThrow);
 	IntendTurnRight(RightThrow);
-
-	//DrawDebugLine(
-	//	GetWorld(),
-	//	GetOwner()->GetActorLocation(),
-	//	GetOwner()->GetActorLocation() + (MoveVelocity * 100),
-	//	FColor(0, 255, 0),
-	//	false,
-	//	0.f,
-	//	0.f,
-	//	10.f);
 }
 
 void UTankMovementComponent::IntendMoveForward(float Throw)
