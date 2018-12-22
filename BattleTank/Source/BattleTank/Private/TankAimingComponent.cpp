@@ -4,17 +4,22 @@
 #include "../Public/TankBarrel.h"
 #include "../Public/TankTurret.h"
 #include "../Public/TankGearHead.h"
-// #include "DrawDebugHelpers.h"
 
 UTankAimingComponent::UTankAimingComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIMING CHAIN 04 (called from Tank). Performs ballistic calculation given desired location and tank launch speed.
+void UTankAimingComponent::Initialize(UTankTurret * TurretToSet, UTankBarrel * BarrelToSet, UTankGearHead * GearHeadToSet)
 {
-	if (!Barrel) { return; }
-	if (!Turret) { return; }
+	Barrel = BarrelToSet;
+	Turret = TurretToSet;
+	GearHead = GearHeadToSet;
+}
+
+void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
+{
+	if (!Barrel || !Turret) { return; }
 
 	FVector OutLaunchVelocity;
 	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
@@ -41,48 +46,21 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)  // AIM
 		auto AimDirection = OutLaunchVelocity.GetSafeNormal(); // Turn OutLaunchVelocity into unit vector
 		auto TankName = GetOwner()->GetName();
 		MoveBarrelTowards(AimDirection);
-		bValidHit = true;
-	}
-	else
-	{
-		bValidHit = false;
 	}
 	MoveHeadToward(HitLocation);
 }
 
-void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet) // Passed from the Tank, set up via the blueprint on BeginPlay
-{
-	Barrel = BarrelToSet;
-}
-
-void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet) // Passed from the Tank, set up via the blueprint on BeginPlay
-{
-	Turret = TurretToSet;
-}
-
-void UTankAimingComponent::SetGearHeadReference(UTankGearHead* GearHeadToSet) // Passed from the Tank, set up via the blueprint on BeginPlay
-{
-	GearHead = GearHeadToSet;
-}
-
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 {
+	if (!Barrel || !Turret) { return; }
+	
 	// Work out difference between current barrel rotation and aim direction
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation(); // Tells us the P/Y/R of the barrel at the moment
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
-
-	if (!DeltaRotator.Equals(FRotator(0), 0.5))
-	{
-		IndicatorColor = FColor(255, 0, 0);
-	}
-	else
-	{
-		IndicatorColor = FColor(0, 125, 250);
-	}
 	
-	Barrel->Elevate(DeltaRotator.Pitch); // AIMING CHAIN 05, calls to TankBarrel
-	Turret->Rotate(DeltaRotator.Yaw); // AIMING CHAIN 05, calls to TankTurret
+	Barrel->Elevate(DeltaRotator.Pitch);
+	Turret->Rotate(DeltaRotator.Yaw);
 }
 
 void UTankAimingComponent::MoveHeadToward(FVector HitLocation)
@@ -96,20 +74,6 @@ void UTankAimingComponent::MoveHeadToward(FVector HitLocation)
 		StartLocation,
 		((GearHead->GetForwardVector() * 100000) + StartLocation),
 		ECollisionChannel::ECC_Visibility);
-	
-	/*
-	if (bValidHit) {
-		DrawDebugLine(
-			GetWorld(),
-			StartLocation,
-			AimLocation.Location,
-			IndicatorColor,
-			false,
-			0.f,
-			0.f,
-			2.f);
-	}
-	*/
 
 	auto GearHeadRotator = GearHead->GetForwardVector().Rotation();
 	auto LookRotator = (HitLocation - StartLocation).Rotation();

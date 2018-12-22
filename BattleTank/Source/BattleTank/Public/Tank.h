@@ -9,8 +9,6 @@
 
  // Forward declarations
 class UTankBarrel;
-class UTankTurret;
-class UTankGearHead;
 class UTankAimingComponent;
 class UTankMovementComponent;
 class AProjectile;
@@ -20,29 +18,9 @@ class BATTLETANK_API ATank : public APawn
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void BeginPlay() override;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Setup")
-	UTankAimingComponent* TankAimingComponent = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Setup")
-	UTankMovementComponent* TankMovementComponent = nullptr;
-
 public:
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void SetBarrelReference(UTankBarrel* BarrelToSet); // Get the barrel via the blueprint hook, called on BeginPlay
-
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void SetTurretReference(UTankTurret* TurretToSet); // Get the turret via the blueprint hook, called on BeginPlay
-
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void SetGearHeadReference(UTankGearHead* GearHeadToSet); // Get the gearhead via the blueprint hook, called on BeginPlay
-
-
 	UFUNCTION(BlueprintCallable, Category = "Firing")
 	void Fire();
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	TSubclassOf<AProjectile> ProjectileBluePrint;
@@ -55,13 +33,19 @@ public:
 
 	void AimAt(FVector HitLocation);
 
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Setup")
+	UTankAimingComponent* TankAimingComponent = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Setup")
+	UTankMovementComponent* TankMovementComponent = nullptr;
+
 private:
 	ATank();
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override; // Called to bind functionality to input
+	virtual void BeginPlay() override;
 
-	UTankBarrel* Barrel = nullptr;
-	UTankGearHead* GearHead = nullptr;
+	UTankBarrel* Barrel = nullptr; // TODO remove
 
 	float LastFireTime = 0;
 };

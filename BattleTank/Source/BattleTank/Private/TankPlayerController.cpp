@@ -1,23 +1,25 @@
 // Copyright ChristmasLights 2018
 
 #include "../Public/TankPlayerController.h"
+#include "../Public/TankAimingComponent.h"
 #include "../Public/Tank.h"
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto ControlledTank = GetControlledTank();
-	if (!ControlledTank)
+	auto AimingComponent = GetControlledTank()->FindComponentByClass<UTankAimingComponent>();
+	if (AimingComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("PlayerController not posessing a tank!"));
+		FoundAimingComponent(AimingComponent);
 	}
+	else {UE_LOG(LogTemp, Error, TEXT("PlayerController can't find aiming component at Begin Play!")) }
 }
 
 void ATankPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AimTowardsCrosshair(); // AIMING CHAIN 01
+	AimTowardsCrosshair();
 }
 
 void ATankPlayerController::AimTowardsCrosshair()
@@ -27,7 +29,7 @@ void ATankPlayerController::AimTowardsCrosshair()
 	FVector HitLocation; // Out parameter
 	if (GetSightRayHitLocation(HitLocation)) // Has "side-effect", is going to line trace
 	{
-		GetControlledTank()->AimAt(HitLocation); // AIMING CHAIN 02. Now that we have a desired hit location, send it to the tank for calculations.
+		GetControlledTank()->AimAt(HitLocation); //  Now that we have a desired hit location, send it to the tank for calculations.
 		LastHit = HitLocation;
 	}
 	else
@@ -68,7 +70,7 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) cons
 
 bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector& LookDirection) const
 {
-	FVector CameraWorldLocation; // To be discarded
+	FVector CameraWorldLocation;
 	return DeprojectScreenPositionToWorld(
 		ScreenLocation.X,
 		ScreenLocation.Y,
