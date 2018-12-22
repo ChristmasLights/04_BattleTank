@@ -7,7 +7,7 @@
 #include "Engine/World.h"
 #include "TankGearHead.generated.h"
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = ("_TankComponents"), meta = (BlueprintSpawnableComponent))
 class BATTLETANK_API UTankGearHead : public UStaticMeshComponent
 {
 	GENERATED_BODY()

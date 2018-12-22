@@ -18,7 +18,7 @@ class UTankTurret;
 class UTankGearHead;
 
 // Holds barrel's properties
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=("_TankComponents"), meta=(BlueprintSpawnableComponent) )
 class BATTLETANK_API UTankAimingComponent : public UActorComponent
 {
 	GENERATED_BODY()
