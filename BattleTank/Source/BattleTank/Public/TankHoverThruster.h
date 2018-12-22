@@ -7,6 +7,18 @@
 #include "Engine/World.h"
 #include "TankHoverThruster.generated.h"
 
+
+UENUM()
+enum class EHoverState : uint8
+{
+	Abort,
+	Cutoff,
+	Starting,
+	Hovering,
+	Gliding
+};
+
+
 class UStaticMeshComponent;
 
 UCLASS(ClassGroup = ("_TankComponents"), meta = (BlueprintSpawnableComponent))
@@ -19,6 +31,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	// TODO Wire up cutoff event to tank movement controller -- have it also cut off rear thrusters when too high, so player can't fly away and out of the map.
+
 public:
 
 	UTankHoverThruster();
@@ -27,7 +41,7 @@ public:
 	void Hover();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Hover")
-	float DesiredHeight = 80.f;
+	float DesiredHeight = 140.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	float Gain = 2.4f;
@@ -36,29 +50,34 @@ public:
 	float Damping = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Hover")
+	float GlideHeight = 400.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	int32 NumberOfThrusters = 4;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Cutoff")
-	float CutoffAngularVelocity = 400.f;
+	float CutoffAngularVelocity = 500.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Cutoff")
-	float CutoffRollVelocity = 400.f;
+	float CutoffHeight = 1500.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Cutoff")
 	float RestartTime = 2.f;
 
-	//UPROPERTY(EditDefaultsOnly, Category = Cutoff)
-	//float StartupTime = 1.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Hover")
+	EHoverState Status;
 
 private:
 	float Mass;
 
 	float Weight; // This is the weight to be supported by each individual thruster; i.e. inversely proportional to NumberOfThrusters
 
+	EHoverState HoverState(float Height, float Time, float AngVel) const;
+
 	UPrimitiveComponent* TankRoot = nullptr;
 	UPrimitiveComponent* TankLeg = nullptr;
 
-	float GetHeight(FVector ThrustPoint);
-	float LastHeight;
-	float CutoffTime = 0;
+	float GetHeight(FVector ThrustPoint) const;
+	float LastGoodHeight;
+	float CutoffTime;
 };

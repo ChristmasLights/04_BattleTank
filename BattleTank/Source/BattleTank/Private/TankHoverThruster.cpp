@@ -22,7 +22,9 @@ void UTankHoverThruster::BeginPlay()
 
 	Weight = -1 * Mass * GetWorld()->GetGravityZ();
 
-	LastHeight = DesiredHeight;
+	LastGoodHeight = DesiredHeight;
+
+	Status = EHoverState::Abort;
 }
 
 void UTankHoverThruster::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,62 +38,92 @@ void UTankHoverThruster::Hover()
 {
 	FVector ThrustPoint = GetAttachParent()->GetSocketLocation(FName("HoverThruster")); // Gets thruster location in world
 
-	// Current Height is difference between trace hit point and socket z point
-	// Height Deviation is difference between Current Height and Desired Float Height
-	// Raw Accel is Height Deviation times(Gain squared)
-	// Socket Z Speed is Physics Linear Velocity z component from socket
-	// Accel Feather is Socket Z Speed times Damping times Gain times 2
-	// Accel is Raw Accel minus Accel Feather
-	// Force is (Accel times Mass) + Weight
-
-
 	float Height = GetHeight(ThrustPoint);
+	float Time = GetWorld()->GetTimeSeconds();
 
 	FVector AngVel = TankLeg->GetPhysicsAngularVelocityInDegrees();
 	FVector LinVel = TankLeg->GetPhysicsLinearVelocityAtPoint(ThrustPoint);
-	FVector TankAngVel = TankRoot->GetPhysicsAngularVelocityInDegrees();
 
-	float Time = GetWorld()->GetTimeSeconds();
+	Status = HoverState(Height, Time, AngVel.Size());
 
-	if (Time - CutoffTime > RestartTime) // If the thruster has cooled off
+	switch (Status)
 	{
-		if (Height < 1000 && AngVel.Size() < CutoffAngularVelocity) // If the vehicle isn't too high or spinning too fast
+	case EHoverState::Cutoff:
+		{ return; }
+	case EHoverState::Abort:
+		{ CutoffTime = Time; return; }
+	case EHoverState::Starting:
 		{
 			float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
-
-			if (Time - CutoffTime - RestartTime > 1) // If 1-second ramp-up has completed
-			{
-				// Calculate and apply proper hover force
-				float Force = (Mass * Accel) + Weight;
-				TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
-			}
-			else
-			{
-				// Ramp up force over 1 second
-				float Force = (Mass * Accel) * (Time - CutoffTime - RestartTime) * (Time - CutoffTime - RestartTime) + Weight;
-				TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
-			}
+			float Force = (Mass * Accel) * (Time - CutoffTime - RestartTime) * (Time - CutoffTime - RestartTime) + Weight;
+			TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			return;
 		}
-		else
+	case EHoverState::Hovering:
 		{
-			CutoffTime = Time;
+			LastGoodHeight = Height;
+			float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
+			float Force = (Mass * Accel) + Weight;
+			TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			return;
+		}
+	case EHoverState::Gliding:
+		{
+			float Accel = ((DesiredHeight - LastGoodHeight) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
+			float Force = (Mass * Accel) + Weight;
+			TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			return;
 		}
 	}
 }
 
 //Line trace by visibility from hover thruster socket point down
-float UTankHoverThruster::GetHeight(FVector ThrustPoint)
+float UTankHoverThruster::GetHeight(FVector ThrustPoint) const
 {
 	FHitResult Ground;
-	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 100000), ECollisionChannel::ECC_Visibility);
+	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 100), ECollisionChannel::ECC_Visibility);
 
 	if (Ground.IsValidBlockingHit())
 	{
-		LastHeight = Ground.Distance;
 		return Ground.Distance;
 	}
 	else
 	{
-		return LastHeight;
+		return 0; // TODO Get a better behavior for this return value.
+	}
+}
+
+// Get the current state of the vehicle
+EHoverState UTankHoverThruster::HoverState(float Height, float Time, float AngVel) const
+{
+	if (Time - CutoffTime > RestartTime) // If the thruster has cooled off
+	{
+		if (Height < CutoffHeight && AngVel < CutoffAngularVelocity) // If the vehicle isn't too high or spinning too fast
+		{
+			if (Time - CutoffTime - RestartTime > 1) // If 1-second ramp-up has completed
+			{
+				if (Height < GlideHeight) // If the thruster is below the gliding zone
+				{
+					return EHoverState::Hovering;
+				}
+				else // Since it isn't too high and isn't below the gliding zone, it must be in the gliding zone
+				{
+					UE_LOG(LogTemp, Warning, TEXT("%f: Gliding!"), Time)
+					return EHoverState::Gliding;
+				}
+			}
+			else // The thruster is in the first second of ramping up
+			{
+				return EHoverState::Starting;
+			}
+		}
+		else // Vehicle is too high or spinning too fast -- abort!
+		{
+			return EHoverState::Abort;
+		}
+	}
+	else // The thruster has not yet cooled off.
+	{
+		return EHoverState::Cutoff;
 	}
 }
