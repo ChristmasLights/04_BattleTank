@@ -1,7 +1,6 @@
 // Copyright ChristmasLights 2018
 
 #include "../Public/Tank.h"
-#include "../Public/TankAimingComponent.h"
 #include "../Public/TankBarrel.h"
 #include "../Public/Projectile.h"
 
@@ -13,12 +12,6 @@ ATank::ATank()
 void ATank::BeginPlay()
 {
 	Super::BeginPlay(); // Need super for Blueprint BeginPlay to trigger
-}
-
-void ATank::AimAt(FVector HitLocation)
-{
-	if (!ensure(TankAimingComponent)) { return; }
-	TankAimingComponent->AimAt(HitLocation, LaunchSpeed);
 }
 
 void ATank::Fire()
