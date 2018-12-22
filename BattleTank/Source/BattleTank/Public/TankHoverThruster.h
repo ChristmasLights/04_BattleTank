@@ -27,7 +27,7 @@ public:
 	void Hover();
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
-	float DesiredHeight = 200.f;
+	float DesiredHeight = 80.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = Hover)
 	float Gain = 2.4f;
