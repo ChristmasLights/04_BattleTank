@@ -48,10 +48,8 @@ void UTankHoverThruster::Hover()
 
 	switch (Status)
 	{
-	case EHoverState::Cutoff:
-		{ return; }
-	case EHoverState::Abort:
-		{ CutoffTime = Time; return; }
+	case EHoverState::Cutoff: { return; }
+	case EHoverState::Abort: { CutoffTime = Time; return; }
 	case EHoverState::Starting:
 		{
 			float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
@@ -102,28 +100,13 @@ EHoverState UTankHoverThruster::HoverState(float Height, float Time, float AngVe
 		{
 			if (Time - CutoffTime - RestartTime > 1) // If 1-second ramp-up has completed
 			{
-				if (Height < GlideHeight) // If the thruster is below the gliding zone
-				{
-					return EHoverState::Hovering;
-				}
-				else // Since it isn't too high and isn't below the gliding zone, it must be in the gliding zone
-				{
-					UE_LOG(LogTemp, Warning, TEXT("%f: Gliding!"), Time)
-					return EHoverState::Gliding;
-				}
+				if (Height < GlideHeight) { return EHoverState::Hovering; } // If the thruster is below the gliding zone
+
+				else { return EHoverState::Gliding; } // Since it isn't too high and isn't below the gliding zone, it must be in the gliding zone
 			}
-			else // The thruster is in the first second of ramping up
-			{
-				return EHoverState::Starting;
-			}
+			else { return EHoverState::Starting; } // The thruster is in the first second of ramping up
 		}
-		else // Vehicle is too high or spinning too fast -- abort!
-		{
-			return EHoverState::Abort;
-		}
+		else { return EHoverState::Abort; } // Vehicle is too high or spinning too fast -- abort!
 	}
-	else // The thruster has not yet cooled off.
-	{
-		return EHoverState::Cutoff;
-	}
+	else { return EHoverState::Cutoff; } // The thruster has not yet cooled off.
 }

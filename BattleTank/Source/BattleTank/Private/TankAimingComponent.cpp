@@ -4,6 +4,7 @@
 #include "../Public/TankBarrel.h"
 #include "../Public/TankTurret.h"
 #include "../Public/TankGearHead.h"
+#include "../Public/Projectile.h"
 
 UTankAimingComponent::UTankAimingComponent()
 {
@@ -80,4 +81,22 @@ void UTankAimingComponent::MoveHeadToward(FVector HitLocation)
 	auto DeltaRotator = LookRotator - GearHeadRotator;
 
 	GearHead->Aim(DeltaRotator.Pitch, DeltaRotator.Yaw);
+}
+
+void UTankAimingComponent::Fire()
+{
+	if (!ensure(Barrel && ProjectileBlueprint)) { return; }
+	bool isReloaded = (GetWorld()->GetTimeSeconds() - LastFireTime) > ReloadTimeInSeconds;
+
+	if (isReloaded)
+	{
+		auto Projectile = GetWorld()->SpawnActor<AProjectile>(
+			ProjectileBlueprint,
+			Barrel->GetSocketLocation(FName("Projectile")),
+			Barrel->GetSocketRotation(FName("Projectile"))
+			);
+
+		Projectile->LaunchProjectile(LaunchSpeed);
+		LastFireTime = GetWorld()->GetTimeSeconds();
+	}
 }
