@@ -8,6 +8,11 @@ void UTankRearLeg::BeginPlay()
 	Super::BeginPlay();
 }
 
+UTankRearLeg::UTankRearLeg()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+}
+
 void UTankRearLeg::SetThrottle(float Throttle)
 {
 	auto ForceApplied = GetForwardVector() * Throttle * ThrusterMaxForce;
@@ -17,4 +22,8 @@ void UTankRearLeg::SetThrottle(float Throttle)
 	if (!ensure(TankRoot)) { return; }
 
 	TankRoot->AddForceAtLocation(ForceApplied, ThrustPoint);
+}
+
+void UTankRearLeg::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
+{
 }

@@ -16,6 +16,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UTankRearLeg();
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void SetThrottle(float Throttle);
@@ -25,5 +26,7 @@ public:
 
 private:
 	
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+
 	FVector ThrustPoint;
 };

@@ -40,6 +40,8 @@ public:
 
 	void Hover();
 
+	void SlideDamp(float DeltaTime);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	float DesiredHeight = 140.f;
 

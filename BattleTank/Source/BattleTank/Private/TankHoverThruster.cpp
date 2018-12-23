@@ -32,6 +32,8 @@ void UTankHoverThruster::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	Hover();
+	
+	// SlideDamp(DeltaTime); // Causes unrealistic air-acceleration, won't use for now
 }
 
 void UTankHoverThruster::Hover()
@@ -104,4 +106,15 @@ float UTankHoverThruster::GetHeight(FVector ThrustPoint) const
 	if (Ground.IsValidBlockingHit()) 
 	{ return Ground.Distance; }
 	else { return 0; } // TODO Get a better behavior for this return value.
+}
+
+void UTankHoverThruster::SlideDamp(float DeltaTime)
+{
+	auto SlippageSpeed = FVector::DotProduct(GetRightVector(), TankRoot->GetPhysicsLinearVelocity());
+
+	auto Accel = -SlippageSpeed / DeltaTime * GetRightVector();
+
+	auto Force = Mass * Accel / 32; // The 32 should be turned into a member parameter, if this function is ever used
+
+	TankRoot->AddForce(Force);
 }
