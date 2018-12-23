@@ -75,22 +75,6 @@ void UTankHoverThruster::Hover()
 	}
 }
 
-//Line trace by visibility from hover thruster socket point down
-float UTankHoverThruster::GetHeight(FVector ThrustPoint) const
-{
-	FHitResult Ground;
-	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 100), ECollisionChannel::ECC_Visibility);
-
-	if (Ground.IsValidBlockingHit())
-	{
-		return Ground.Distance;
-	}
-	else
-	{
-		return 0; // TODO Get a better behavior for this return value.
-	}
-}
-
 // Get the current state of the vehicle
 EHoverState UTankHoverThruster::HoverState(float Height, float Time, float AngVel) const
 {
@@ -109,4 +93,15 @@ EHoverState UTankHoverThruster::HoverState(float Height, float Time, float AngVe
 		else { return EHoverState::Abort; } // Vehicle is too high or spinning too fast -- abort!
 	}
 	else { return EHoverState::Cutoff; } // The thruster has not yet cooled off.
+}
+
+//Line trace by visibility from hover thruster socket point down
+float UTankHoverThruster::GetHeight(FVector ThrustPoint) const
+{
+	FHitResult Ground;
+	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 100), ECollisionChannel::ECC_Visibility);
+
+	if (Ground.IsValidBlockingHit()) 
+	{ return Ground.Distance; }
+	else { return 0; } // TODO Get a better behavior for this return value.
 }
