@@ -51,6 +51,10 @@ private:
 	void MoveBarrelTowards(FVector AimDirection);
 	void MoveHeadToward(FVector HitLocation);
 
+	bool bIsBarrelMoving();
+
+	FVector AimDirection;
+
 	UTankBarrel* Barrel = nullptr;
 	UTankTurret* Turret = nullptr;
 	UTankGearHead* GearHead = nullptr;
@@ -62,7 +66,7 @@ private:
 	TSubclassOf<AProjectile> ProjectileBlueprint;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
-	float ReloadTimeInSeconds = 0.1f;
+	float ReloadTimeInSeconds = 1.0f;
 
 	float LastFireTime = 0;
 };
