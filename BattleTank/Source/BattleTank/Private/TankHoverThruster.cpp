@@ -32,8 +32,6 @@ void UTankHoverThruster::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	Hover();
-	
-	// SlideDamp(DeltaTime); // Causes unrealistic air-acceleration, won't use for now
 }
 
 void UTankHoverThruster::Hover()
@@ -45,6 +43,7 @@ void UTankHoverThruster::Hover()
 
 	FVector AngVel = TankLeg->GetPhysicsAngularVelocityInDegrees();
 	FVector LinVel = TankLeg->GetPhysicsLinearVelocityAtPoint(ThrustPoint);
+	FVector LocalUp = TankLeg->GetUpVector(); // TODO Has "righting" effect when tank is flipped, but still need a proper behavior for rollover scenario
 
 	Status = HoverState(Height, Time, AngVel.Size());
 
@@ -56,7 +55,7 @@ void UTankHoverThruster::Hover()
 		{
 			float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
 			float Force = (Mass * Accel) * (Time - CutoffTime - RestartTime) * (Time - CutoffTime - RestartTime) + Weight;
-			TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			TankRoot->AddForceAtLocation(Force*LocalUp, ThrustPoint);
 			return;
 		}
 	case EHoverState::Hovering:
@@ -64,14 +63,14 @@ void UTankHoverThruster::Hover()
 			LastGoodHeight = Height;
 			float Accel = ((DesiredHeight - Height) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
 			float Force = (Mass * Accel) + Weight;
-			TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			TankRoot->AddForceAtLocation(Force*LocalUp, ThrustPoint);
 			return;
 		}
 	case EHoverState::Gliding:
 		{
 			float Accel = ((DesiredHeight - LastGoodHeight) * Gain * Gain * Gain * Gain * Gain) - (LinVel.Z * Damping * Gain * 2);
 			float Force = (Mass * Accel) + Weight;
-			TankRoot->AddForceAtLocation(Force*(TankLeg->GetUpVector()), ThrustPoint);
+			TankRoot->AddForceAtLocation(Force*LocalUp, ThrustPoint);
 			return;
 		}
 	}
@@ -101,13 +100,15 @@ EHoverState UTankHoverThruster::HoverState(float Height, float Time, float AngVe
 float UTankHoverThruster::GetHeight(FVector ThrustPoint) const
 {
 	FHitResult Ground;
-	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 100), ECollisionChannel::ECC_Visibility);
+	GetWorld()->LineTraceSingleByChannel(Ground, ThrustPoint, ThrustPoint - FVector(0, 0, DesiredHeight * 10000), ECollisionChannel::ECC_Visibility); // Needs to ray-cast down REALLY far to ensure hit with ground in flyaway scenario
 
 	if (Ground.IsValidBlockingHit()) 
 	{ return Ground.Distance; }
-	else { return 0; } // TODO Get a better behavior for this return value.
+	else { return DesiredHeight; } // TODO Get a better behavior for this return value. Returning DesiredHeight causes "sticking" when tank is on ground (if socket is slightly through world, maybe tune socket locatioion), but returning 0 allows flyaway when too high. Maybe use different if() condition.
 }
 
+
+// Causes unrealistic air-acceleration, won't use for now. If used, call OnTick.
 void UTankHoverThruster::SlideDamp(float DeltaTime)
 {
 	auto SlippageSpeed = FVector::DotProduct(GetRightVector(), TankRoot->GetPhysicsLinearVelocity());

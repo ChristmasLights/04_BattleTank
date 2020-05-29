@@ -21,6 +21,7 @@ void UTankMovementComponent::RequestDirectMove(const FVector & MoveVelocity, boo
 	float RightThrow = FVector::CrossProduct(TankForward, AIForwardIntention).Z;
 	IntendMoveForward(ForwardThrow);
 	IntendTurnRight(RightThrow);
+	UE_LOG(LogTemp, Warning, TEXT("%s moving %f fwd, %f right"), *GetOwner()->GetName(), ForwardThrow, RightThrow)
 }
 
 void UTankMovementComponent::IntendMoveForward(float Throw)

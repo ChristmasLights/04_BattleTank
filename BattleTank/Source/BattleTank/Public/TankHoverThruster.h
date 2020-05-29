@@ -52,7 +52,7 @@ public:
 	float Damping = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Hover")
-	float GlideHeight = 400.f;
+	float GlideHeight = 350.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Hover")
 	int32 NumberOfThrusters = 4;

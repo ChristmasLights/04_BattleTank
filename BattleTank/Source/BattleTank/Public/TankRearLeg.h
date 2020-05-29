@@ -21,12 +21,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void SetThrottle(float Throttle);
 
+	void ApplyThrust();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float ThrusterMaxForce = 100000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float CutoffHeight = 6000.f;
 
 private:
 	
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
+	float GetHeight() const;
+
 	FVector ThrustPoint;
+
+	float CurrentThrottle = 0;
 };
